@@ -1,0 +1,19 @@
+{
+    "name": "oryx-test-service",
+    "version": "0.0.1",
+    "description": "oryx-tests-service",
+    "scripts": {
+      "start": "node server.js",
+      "test": "jest"
+    },
+    "author": "Nicolas Vandemoortele",
+    "license": "ISC",
+    "devDependencies": {
+        "jest": "^26.6.3"
+    },
+    "dependencies": {
+        "@aws-sdk/client-sqs": "3.797.0",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1"     
+    }
+}
