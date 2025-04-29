@@ -1,0 +1,45 @@
+{
+    "use": "cypress",
+    "type": "e2e",
+    "project": "example_project",
+    "video": true,
+    "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+    "retry": 2,
+    "run": {
+        "base_url": "https://example.com",
+        "browsers": [
+            "chrome",
+            "firefox",
+            "edge",
+            "safari"
+        ],
+        "viewports": [
+            {
+                "name": "desktop",
+                "width": 1280,
+                "height": 720
+            },
+            {
+                "name": "mobile",
+                "width": 375,
+                "height": 667
+            }
+        ],
+        "tests": [
+            {
+                "title": "Test 1 - UUID",
+                "code": "cy.visit('/'); cy.get('h1').should('contain', 'Welcome');"
+            }
+        ],
+        "custom_commands": [
+            {
+                "key": "customCommand",
+                "code": "cy.log('Custom command executed');",
+                "parameters": [
+                    "param1",
+                    "param2"
+                ]
+            }
+        ]
+    }
+}

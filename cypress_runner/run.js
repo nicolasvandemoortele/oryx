@@ -1,5 +1,6 @@
 const config  = require('../oryx.config');
 const sqs     = require('../libs/sqs');
+const cypress = require('./cypress_run');
 
 /**
  * Processes messages from the SQS queue
@@ -19,10 +20,18 @@ const processMessage = async () => {
             const body = JSON.parse(message.Body);
             console.log("Received message:", body);
 
+            // Check structure of the message
+            if (body.use !== 'cypress') {
+                console.error("Invalid message type");
+                continue;
+            }
+
             // Process the message here
+            const results = cypress.runCypress(body);
+            console.log("Cypress run results:", results);
 
             // Delete the message after processing
-            // await sqs.deleteMessage(config.sqsQueueUrls.cypress, receiptHandle);
+            await sqs.deleteMessage(config.sqsQueueUrls.cypress, receiptHandle);
         }
     }
 
