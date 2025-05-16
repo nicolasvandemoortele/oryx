@@ -23,9 +23,7 @@ const processMessage = async () => {
             switch (body.use) {
                 case 'cypress':
                     console.log("Processing Cypress run");
-                    // Process the message here
-                    const results = await runCypress(body);
-                    console.log("Cypress run results:", results);
+                    await runCypress(body);
                     break;
                 default:
                     console.error("Invalid message type");
@@ -41,11 +39,8 @@ const processMessage = async () => {
 }
 
 const runCypress = async (params) => {
-    // Setup the project folder for Cypress
     let cypressRunner = new CypressRunner(params);
 
-    // Run Cypress with the provided parameters
-    // Create runs from each browser and viewports
     const run = params.run;
     const viewports = run.viewports || [{ width: 1280, height: 800 }];
     const browsers = run.browsers || ["electron"];
@@ -55,20 +50,25 @@ const runCypress = async (params) => {
             cypressRunner.runViewportHeight = viewport.height;
             cypressRunner.runViewportWidth = viewport.width;
 
-            // Create the run folder
             cypressRunner.createRunFolder();
             cypressRunner.generateSpecFiles();
 
             const results = await cypressRunner.runCypress();
-            console.log(JSON.stringify(results.runs));
+
+            await sqs.sendMessage(config.sqsQueueUrls.oryx, {
+                use: "cypress",
+                run: {
+                    id: run.id,
+                    browser: browser,
+                    viewport: viewport,
+                    results: cypressRunner.formatResults(results.runs)
+                }
+            });
 
             cypressRunner.deleteRunFolder();
             
         }
     }
-
-    // Handle the results
-    return "Cypress run completed";
 }
 
 module.exports = {

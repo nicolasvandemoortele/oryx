@@ -1,7 +1,7 @@
-const config  = require('../oryx.config');
 const fs      = require('fs');
 const path    = require("node:path");
 const cypress = require("cypress");
+const { extractUUID } = require("../libs/util");
 
 let CypressRunner = class {
 
@@ -108,6 +108,23 @@ let CypressRunner = class {
         const results = await cypress.run(this.runConfig);
         return results;
     }
+
+    formatResults(runResults) {
+        const tests = [];
+        for (const result of runResults) {
+            for (const test of result.tests) {
+                const flaky = isFlaky(test.attempts);
+                tests.push({
+                    title: test.title[0],
+                    state: test.state,
+                    duration: test.duration,
+                    error: test.displayError,
+                    flaky: flaky,
+                });
+            }
+        }
+        return tests;
+    }
 }
 
 const cypressFolderStructure = (root) => ({
@@ -116,12 +133,11 @@ const cypressFolderStructure = (root) => ({
     videoDir: path.resolve(root, "cypress/videos"),
 });
 
-const extractUUID = (str) => {
-	const uuidLen = 36;
-	if (str.length <= uuidLen) {
-		return str;
-	}
-	return str.slice(-uuidLen);
+const isFlaky = (attempts) => {
+    if (attempts.length > 1) {
+        return attempts.some(attempt => attempt.state !== attempts[0].state);
+    }
+    return false
 }
 
-module.exports = CypressRunner;
+module.exports = CypressRunner

@@ -9,6 +9,7 @@ const config = {
     port:               process.env.PORT,
     sqsQueueUrls:       {
         cypress: process.env.CYPRESS_QUEUE_URL_ENV,
+        oryx:    process.env.ORYX_QUEUE_URL_ENV,
     }
 };
 

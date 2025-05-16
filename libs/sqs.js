@@ -39,6 +39,27 @@ const receiveMessage = async (queueUrl) => {
 };
 
 /**
+ * Sends a message to an SQS queue
+ * @param {string} queueUrl - The URL of the SQS queue
+ * @param {Object} messageBody - The message body to send
+ * @returns {Promise<string>} - A promise that resolves to the message ID
+ */
+const sendMessage = async (queueUrl, messageBody) => {
+    const params = {
+        QueueUrl: queueUrl,
+        MessageBody: JSON.stringify(messageBody)
+    };
+
+    try {
+        const data = await sqsClient.send(new SendMessageCommand(params));
+        return data.MessageId;
+    } catch (error) {
+        console.error("Error sending message:", error);
+        throw error;
+    }
+};
+
+/**
  * Deletes a message from an SQS queue
  * @param {string} queuUrl - The URL of the SQS queue
  * @param {string} receiptHandle - The receipt handle of the message to delete
@@ -59,5 +80,6 @@ const deleteMessage = async (queueUrl, receiptHandle) => {
 
 module.exports = {
     receiveMessage,
-    deleteMessage
+    sendMessage,
+    deleteMessage,
 }
