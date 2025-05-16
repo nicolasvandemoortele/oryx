@@ -1,6 +1,7 @@
 const config  = require('../oryx.config');
 const express = require('express');
-const run = require('./run');
+const run     = require('./run');
+const cypress = require('cypress');
 
 const port = config.port;
 

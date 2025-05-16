@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="5.219" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-05-15T23:15:04" tests="0" file="cypress/e2e/14e1ff84-b91c-42d0-84c7-8a5ca02b6af8_specs.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="14e1ff84-b91c-42d0-84c7-8a5ca02b6af8" timestamp="2025-05-15T23:15:04" tests="1" time="5.219" failures="1">
+    <testcase name="14e1ff84-b91c-42d0-84c7-8a5ca02b6af8 Test 1 - 14e1ff84-b91c-42d0-84c7-8a5ca02b6af8" time="0.000" classname="Test 1 - 14e1ff84-b91c-42d0-84c7-8a5ca02b6af8">
+      <failure message="Timed out retrying after 4000ms: expected &apos;&lt;h1.text-4xl.font-extrabold.tracking-tight.text-gray-900.sm:text-5xl.md:text-6xl&gt;&apos; to contain &apos;test&apos;" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: expected '<h1.text-4xl.font-extrabold.tracking-tight.text-gray-900.sm:text-5xl.md:text-6xl>' to contain 'test'
+    at Context.eval (webpack://oryx-test-service/./cypress/e2e/14e1ff84-b91c-42d0-84c7-8a5ca02b6af8_specs.cy.js:2:28)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>
