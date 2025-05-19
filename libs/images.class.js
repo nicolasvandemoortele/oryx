@@ -19,15 +19,12 @@ let Screenshot = class {
     }
 
     async checkBase() {
-        //Check if file exists on S3
         const baseImage = await checkFileExists(`${this.project}/${this.base}`);
         if (baseImage) {
-            //Download base file if yes
             await downloadFile(this.project, this.base, `./${this.folder}`);
 
             return true;
         } else {
-            //Upload source as base if no
             uploadFile(this.source, this.folder, `${this.project}/${this.base}`);
 
             return false;
