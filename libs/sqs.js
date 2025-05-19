@@ -1,5 +1,6 @@
 const {
     SQSClient,
+    SendMessageCommand,
     ReceiveMessageCommand,
     DeleteMessageCommand
 } = require ('@aws-sdk/client-sqs');

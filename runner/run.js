@@ -55,17 +55,17 @@ const runCypress = async (params) => {
 
             const results = await cypressRunner.runCypress();
 
-            await sqs.sendMessage(config.sqsQueueUrls.oryx, {
-                use: "cypress",
-                run: {
-                    id: run.id,
-                    browser: browser,
-                    viewport: viewport,
-                    results: cypressRunner.formatResults(results.runs)
-                }
-            });
+            // await sqs.sendMessage(config.sqsQueueUrls.oryx, {
+            //     use: "cypress",
+            //     run: {
+            //         id: run.id,
+            //         browser: browser,
+            //         viewport: viewport,
+            //         results: cypressRunner.processResults(results.runs)
+            //     }
+            // });
 
-            cypressRunner.deleteRunFolder();
+            // cypressRunner.deleteRunFolder();
             
         }
     }

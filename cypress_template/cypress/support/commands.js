@@ -83,13 +83,13 @@ function escape(htmlStr) {
          .replace(/'/g, "&#39;");
 }
 
-// Cypress.Commands.add(
-//   'uvscreenshot',
-//   (name, options = {}) => {
-//     const title = Cypress.currentTest.title
-//     const uuid = title.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)
-//     const imageName = name.replace(" ", "_")
+Cypress.Commands.add(
+  'oryx_screenshot',
+  (name) => {
+    const title = Cypress.currentTest.title
+    const uuid = title.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)
+    const imageName = name.replace(" ", "_")
 
-//     cy.screenshot(`comparison/${uuid}_${imageName}`, {capture: 'viewport'})    
-//   }
-// )
+    cy.screenshot(`comparison/${uuid}_${imageName}`, {capture: 'viewport'})    
+  }
+)

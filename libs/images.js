@@ -1,1 +1,0 @@
-// Handle the image comparisons

@@ -7,6 +7,7 @@ const config = {
     awsAccessKeyId:     process.env.AWS_ACCESS_KEY_ID_ENV,
     awsAccessKey:       process.env.AWS_SECRET_ACCESS_KEY_ENV,
     port:               process.env.PORT,
+    s3BucketName:       process.env.BUCKET_RUNNER_ENV,
     sqsQueueUrls:       {
         cypress: process.env.CYPRESS_QUEUE_URL_ENV,
         oryx:    process.env.ORYX_QUEUE_URL_ENV,

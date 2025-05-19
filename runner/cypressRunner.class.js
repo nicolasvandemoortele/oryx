@@ -1,7 +1,8 @@
-const fs      = require('fs');
-const path    = require("node:path");
-const cypress = require("cypress");
+const fs              = require('fs');
+const path            = require("node:path");
+const cypress         = require("cypress");
 const { extractUUID } = require("../libs/util");
+const { uploadFile }  = require("../libs/s3");
 
 let CypressRunner = class {
 
@@ -37,6 +38,8 @@ let CypressRunner = class {
             project: params.project,
         };
         this.tests = params.run.tests;
+        this.runId = params.run.id;
+        this.type = params.type;
         this.projectFolder = "";
     }
 
@@ -72,23 +75,34 @@ let CypressRunner = class {
             };
         });
 
-		folders.forEach((folder) => {
-			
+		folders.forEach((folder) => {		
 			var code = `describe('${folder.name}', () => {`;
 			var test;
 			var specs = folder.tests;
 			for (test of specs)
 			{
 				let testCode = test.code;
-				if(testCode === '') {
-					code = code + `it.skip('${test.title.replace(/[^\w .()-]/g, '')}', () => {\n`;
-					code = code + "cy.log('Code empty, skipping test')";
-					code = code + "\n});";
-				} else {
-					code = code + `it('${test.title.replace(/[^\w .()-]/g, '')}', () => {\n`;
-					code = code + testCode.replace(/<br>/g,"");
-					code = code + "\n});";
-				}
+                const title = test.title.replace(/[^\w .()-]/g, '');
+                if(this.type === 'e2e') {
+                    if(testCode === '') {
+                        code = code + `it.skip('${title}', () => {\n`;
+                        code = code + "cy.log('Code empty, skipping test')";
+                    } else {
+                        code = code + `it('${title}', () => {\n`;
+                        code = code + testCode.replace(/<br>/g,"");
+                    }
+                } else if (this.type === 'visual') {
+                    if(testCode === '') {
+                        code = code + `it('${title}', () => {\n`;
+                        code = code + `cy.visit("${test.url}");\n`;
+                        code = code + `cy.oryx_screenshot('${title}');`;
+                    } else {
+                        code = code + `it('${title}', () => {\n`;
+                        code = code + testCode.replace(/<br>/g,"") + "\n";
+                        code = code + `cy.oryx_screenshot('${title}');`;
+                    }
+                }
+                code = code + "\n});";
 			};
 
 			code = code + "});";
@@ -104,27 +118,42 @@ let CypressRunner = class {
 
     async runCypress() {
         this.runConfig.reporterOptions.reportDir = cypressFolderStructure(this.projectFolder).reportDir;
-        console.log("Running Cypress with config:", this.runConfig);
         const results = await cypress.run(this.runConfig);
         return results;
     }
 
-    formatResults(runResults) {
+    processResults(runResults) {
         const tests = [];
         for (const result of runResults) {
             for (const test of result.tests) {
                 const flaky = isFlaky(test.attempts);
+                const screenshot = result.screenshots.find(screenshot => 
+                    screenshot.path && screenshot.path.includes(test.title[0])
+                );
+                let screenshotName = "";
+                if (screenshot) {
+                    screenshotName = `${this.runId}_${test.title[0]}.png`;
+                    try {
+                        uploadFile(screenshot.path, screenshotName);
+                    } catch (error) {
+                        console.error("Error uploading screenshot: ", error);
+                    }                                   
+                }
                 tests.push({
                     title: test.title[0],
                     state: test.state,
                     duration: test.duration,
                     error: test.displayError,
                     flaky: flaky,
+                    screenshot: screenshotName,
                 });
             }
         }
+        console.log("Processed results: ", tests);
         return tests;
     }
+
+    
 }
 
 const cypressFolderStructure = (root) => ({
