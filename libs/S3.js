@@ -70,10 +70,36 @@ const checkFileExists = async (file) => {
     }
 }
 
+/**
+* Downloads a file from S3
+ * @param {string} file - The file to download
+ * @param {string} destination - The destination to save the file
+ * @returns {Promise<void>}
+ */
+const downloadFile = async (file, destination) => {
+    const params = {
+        Bucket: bucketName,
+        Key: file
+    };
 
+    const data = await s3Client.send(new GetObjectCommand(params));
+    const writeStream = fs.createWriteStream(destination);
+    data.Body.pipe(writeStream);
 
+    return new Promise((resolve, reject) => {
+        writeStream.on('finish', () => {
+            console.log(`Downloaded file ${file} from S3 to ${destination}`);
+            resolve();
+        });
+        writeStream.on('error', (error) => {
+            console.error(`Error downloading file ${file} from S3:`, error);
+            reject(error);
+        });
+    });
+}
 
 module.exports = {
     uploadFile,
     checkFileExists,
+    downloadFile,
 }
