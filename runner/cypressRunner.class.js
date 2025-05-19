@@ -149,7 +149,7 @@ let CypressRunner = class {
                 });
             }
         }
-        console.log("Processed results: ", tests);
+        
         return tests;
     }
 
