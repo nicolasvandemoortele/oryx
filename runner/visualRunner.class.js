@@ -28,10 +28,22 @@ let VisualRunner = class {
         this.diffPath = `./${this.diffS3Path}`;
     }
 
-    copyCurrent(screenshot) {
+    set markupTitles(title) {
+        this.currentMarkup = 'current' + this.viewport + '_' + this.browser + '_' + title + '.json';
+        this.baseMarkup = 'base' + this.viewport + '_' + this.browser + '_' + title + '.json';
+        this.currentMarkupS3Path = `${this.project}/${this.currentMarkup}`;
+        this.baseMarkupS3Path = `${this.project}/${this.baseMarkup}`;
+        this.currentMarkupPath = `./${this.currentMarkupS3Path}`;
+        this.baseMarkupPath = `./${this.baseMarkupS3Path}`;
+    }
+
+    copyCurrent(screenshot, markup) {
         if(!fs.existsSync(this.project)) fs.mkdirSync(this.project);
         if(fs.existsSync(screenshot)) {
             fs.copyFileSync(screenshot, this.currentPath);
+        }
+        if(fs.existsSync(markup)) {
+            fs.copyFileSync(markup, this.currentMarkupPath);
         }
     }
 
@@ -44,6 +56,20 @@ let VisualRunner = class {
             return true;
         } else {
             copyFile(image, this.baseS3Path);
+
+            return false;
+        }
+    }
+
+    async checkBaseMarkup(markup) {
+        const baseMarkup = await checkFileExists(`${this.project}/${this.baseMarkup}`);
+        if (baseMarkup) {
+            if(!fs.existsSync(this.project)) fs.mkdirSync(this.project);
+            await downloadFile(this.baseMarkupS3Path, this.baseMarkupPath);
+
+            return true;
+        } else {
+            copyFile(markup, this.baseMarkupS3Path);
 
             return false;
         }

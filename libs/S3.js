@@ -45,7 +45,6 @@ const uploadFile = async (file, newFile = file) => {
         Body: fileContent,
         Expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
     };
-    console.log(`Uploading file ${file} to S3 bucket ${bucketName} with key ${newFile}`);
     return s3Client.send(new PutObjectCommand(uploadParams));
 }
 
@@ -88,7 +87,6 @@ const downloadFile = async (file, destination) => {
 
     return new Promise((resolve, reject) => {
         writeStream.on('finish', () => {
-            console.log(`Downloaded file ${file} from S3 to ${destination}`);
             resolve();
         });
         writeStream.on('error', (error) => {

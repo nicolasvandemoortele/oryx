@@ -61,7 +61,10 @@ const runCypress = async (params) => {
                 let newFormattedResults = [];
                 for (const result of formattedResults) {
                     visualRunner.imageTitles = result.title;
-                    visualRunner.copyCurrent(`${cypressRunner.projectFolder}/cypress/screenshots/${result.screenshot}`);
+                    visualRunner.copyCurrent(
+                        `${cypressRunner.projectFolder}/cypress/screenshots/${result.screenshot}`,
+                        `${cypressRunner.projectFolder}/cypress/reports/markup.json`
+                    );
                     const baseImage = await visualRunner.checkBase(result.screenshot);
 
                     if (!baseImage) {
@@ -73,6 +76,10 @@ const runCypress = async (params) => {
                     if (run.comparison_types.includes("pixel")) {
                         const numDiffPixels = visualRunner.comparePixels();
                         result.visualTest = visualRunner.formatResults("Base image found, comparing images", numDiffPixels); 
+                    }
+
+                    if (run.comparison_types.includes("markup")) {
+                        console.log("Markup comparison not implemented yet");
                     }
                     
                     newFormattedResults.push(result);

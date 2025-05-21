@@ -93,3 +93,46 @@ Cypress.Commands.add(
     cy.screenshot(`${uuid}_${imageName}`, {capture: 'viewport'})    
   }
 )
+
+Cypress.Commands.add(
+  'markup_snapshot',
+  (locators, caseId) => {
+    let markups = [];
+    for (const locator of locators) {
+      cy.get(locator).then(($el) => {
+        const style = $el.attr("style");
+        const css = $el.attr("class");
+        const height = window.getComputedStyle($el[0]).height;
+        const width = window.getComputedStyle($el[0]).width;
+        const color = window.getComputedStyle($el[0]).color;
+        const backgroundColor = window.getComputedStyle($el[0]).backgroundColor;
+        const fontSize = window.getComputedStyle($el[0]).fontSize;
+        const fontFamily = window.getComputedStyle($el[0]).fontFamily;
+        const fontWeight = window.getComputedStyle($el[0]).fontWeight;
+        const fontStyle = window.getComputedStyle($el[0]).fontStyle;
+        const textAlign = window.getComputedStyle($el[0]).textAlign;
+        const visibility = window.getComputedStyle($el[0]).visibility;
+        const markup = {
+          locator: locator,
+          style: style,
+          css: css,
+          height: height,
+          width: width,
+          color: color,
+          backgroundColor: backgroundColor,
+          fontSize: fontSize,
+          fontFamily: fontFamily,
+          fontWeight: fontWeight,
+          fontStyle: fontStyle,
+          textAlign: textAlign,
+          visibility: visibility
+        }
+        markups.push(markup);
+      })
+    }
+    cy.task(
+      'markupReport',
+      { markups, caseId }
+    )
+  }
+)

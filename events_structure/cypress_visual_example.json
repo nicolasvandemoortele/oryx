@@ -31,7 +31,8 @@
             {
                 "title": "Test 1 - UUID",
                 "code": "cy.visit('/'); cy.get('h1').should('contain', 'Welcome');",
-                "url": "/example"
+                "url": "/example",
+                "markup": ["h1", "a", "main"]
             }
         ],
         "custom_commands": [

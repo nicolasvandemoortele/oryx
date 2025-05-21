@@ -40,6 +40,7 @@ let CypressRunner = class {
         this.tests = params.run.tests;
         this.runId = params.run.id;
         this.type = params.type;
+        this.compareTypes = params.run.comparison_types;
         this.projectFolder = "";
     }
 
@@ -95,11 +96,15 @@ let CypressRunner = class {
                     if(testCode === '') {
                         code = code + `it('${title}', () => {\n`;
                         code = code + `cy.visit("${test.url}");\n`;
-                        code = code + `cy.oryx_screenshot('${title}');`;
                     } else {
                         code = code + `it('${title}', () => {\n`;
                         code = code + testCode.replace(/<br>/g,"") + "\n";
-                        code = code + `cy.oryx_screenshot('${title}');`;
+                    }
+                    if (this.compareTypes.includes("pixel")) {
+                        code = code + `cy.oryx_screenshot('${title}');\n`;
+                    }
+                    if (this.compareTypes.includes("markup")) {
+                        code = code + `cy.markup_snapshot(${JSON.stringify(test.markup)}, '${title}');\n`;
                     }
                 }
                 code = code + "\n});";
@@ -124,6 +129,10 @@ let CypressRunner = class {
 
     processResults(runResults) {
         const tests = [];
+        if (!runResults || runResults.length === 0) {
+            console.error("No results found");
+            return tests;
+        }
         for (const result of runResults) {
             for (const test of result.tests) {
                 const flaky = isFlaky(test.attempts);
