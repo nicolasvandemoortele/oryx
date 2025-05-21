@@ -137,7 +137,11 @@ let CypressRunner = class {
                         uploadFile(screenshot.path, screenshotName);
                     } catch (error) {
                         console.error("Error uploading screenshot: ", error);
-                    }                                   
+                    }
+                    fs.renameSync(screenshot.path, path.join(
+                        cypressFolderStructure(this.projectFolder).screenshotDir, 
+                        screenshotName
+                    ));                                   
                 }
                 tests.push({
                     title: test.title[0],
@@ -152,14 +156,13 @@ let CypressRunner = class {
         
         return tests;
     }
-
-    
 }
 
 const cypressFolderStructure = (root) => ({
     reportDir: path.resolve(root, "cypress/reports"),
     specDir: path.resolve(root, "cypress/e2e"),
     videoDir: path.resolve(root, "cypress/videos"),
+    screenshotDir: path.resolve(root, "cypress/screenshots"),
 });
 
 const isFlaky = (attempts) => {

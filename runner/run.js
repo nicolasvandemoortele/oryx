@@ -1,7 +1,7 @@
 const config        = require('../oryx.config');
 const sqs           = require('../libs/sqs');
 const CypressRunner = require('./cypressRunner.class');
-const cypress       = require('cypress');
+const VisualRunner  = require('./visualRunner.class');
 
 /**
  * Processes messages from the SQS queue
@@ -40,7 +40,7 @@ const processMessage = async () => {
 
 const runCypress = async (params) => {
     let cypressRunner = new CypressRunner(params);
-
+    const project = params.project;
     const run = params.run;
     const viewports = run.viewports || [{ width: 1280, height: 800 }];
     const browsers = run.browsers || ["electron"];
@@ -54,14 +54,39 @@ const runCypress = async (params) => {
             cypressRunner.generateSpecFiles();
 
             const results = await cypressRunner.runCypress();
+            let formattedResults = cypressRunner.processResults(results.runs);
 
+            if(params.type === "visual") {
+                const visualRunner = new VisualRunner(project, viewport.name, browser);
+                let newFormattedResults = [];
+                for (const result of formattedResults) {
+                    visualRunner.imageTitles = result.title;
+                    visualRunner.copyCurrent(`${cypressRunner.projectFolder}/cypress/screenshots/${result.screenshot}`);
+                    const baseImage = await visualRunner.checkBase(result.screenshot);
+
+                    if (!baseImage) {
+                        result.visualTest = visualRunner.formatResults("Base image not found, setting new base image", 0);
+                        newFormattedResults.push(result);
+                        continue;
+                    }
+
+                    if (run.comparison_types.includes("pixel")) {
+                        const numDiffPixels = visualRunner.comparePixels();
+                        result.visualTest = visualRunner.formatResults("Base image found, comparing images", numDiffPixels); 
+                    }
+                    
+                    newFormattedResults.push(result);
+                }
+                formattedResults = newFormattedResults;
+            }
+            console.log("Formatted results", formattedResults);
             // await sqs.sendMessage(config.sqsQueueUrls.oryx, {
             //     use: "cypress",
             //     run: {
             //         id: run.id,
             //         browser: browser,
             //         viewport: viewport,
-            //         results: cypressRunner.processResults(results.runs)
+            //         results: formattedResults,
             //     }
             // });
 

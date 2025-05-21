@@ -3,6 +3,7 @@ const {
     S3Client,
     PutObjectCommand,
     GetObjectCommand,
+    CopyObjectCommand,
     DeleteObjectCommand,
     ListObjectsV2Command
 } = require ('@aws-sdk/client-s3');
@@ -31,7 +32,7 @@ const uploadFile = async (file, newFile = file) => {
         const type = mime.contentType(file);
 
     if (!fs.existsSync(file)) {
-        logger.error(`File to upload ${file} does not exist`);
+        console.log(`File to upload ${file} does not exist`);
         return;
     }
 
@@ -81,7 +82,6 @@ const downloadFile = async (file, destination) => {
         Bucket: bucketName,
         Key: file
     };
-
     const data = await s3Client.send(new GetObjectCommand(params));
     const writeStream = fs.createWriteStream(destination);
     data.Body.pipe(writeStream);
@@ -98,8 +98,30 @@ const downloadFile = async (file, destination) => {
     });
 }
 
+/**
+ * Copy a file in S3
+ * @param {string} source - The source file
+ * @param {string} destination - The destination file
+ * @returns {Promise<void>}
+ */
+const copyFile = async (source, destination) => {
+    const params = {
+        Bucket: bucketName,
+        CopySource: `${bucketName}/${source}`,
+        Key: destination
+    };
+
+    try {
+        await s3Client.send(new CopyObjectCommand(params));
+        console.log(`Copied file from ${source} to ${destination}`);
+    } catch (error) {
+        console.error(`Error copying file from ${source} to ${destination}:`, error);
+    }
+}
+
 module.exports = {
     uploadFile,
     checkFileExists,
     downloadFile,
+    copyFile,
 }

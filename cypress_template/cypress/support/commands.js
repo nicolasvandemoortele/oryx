@@ -90,6 +90,6 @@ Cypress.Commands.add(
     const uuid = title.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)
     const imageName = name.replace(" ", "_")
 
-    cy.screenshot(`comparison/${uuid}_${imageName}`, {capture: 'viewport'})    
+    cy.screenshot(`${uuid}_${imageName}`, {capture: 'viewport'})    
   }
 )

@@ -4,7 +4,6 @@ const {
     ReceiveMessageCommand,
     DeleteMessageCommand
 } = require ('@aws-sdk/client-sqs');
-
 const config = require('../oryx.config');
 
 const sqsClient = new SQSClient({
