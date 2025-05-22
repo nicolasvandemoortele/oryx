@@ -62,11 +62,11 @@ let CypressRunner = class {
         this.runConfig.project = this.projectFolder;
     }
 
-    deleteRunFolder() {
+    deleteRunFolders() {
         fs.rmSync(this.projectFolder, { recursive: true, force: true });
     }
 
-	generateSpecFiles () {
+    generateSpecFiles () {
         const specDir = cypressFolderStructure(this.projectFolder).specDir;
 
         const folders = this.tests.map((test) => {
@@ -76,13 +76,13 @@ let CypressRunner = class {
             };
         });
 
-		folders.forEach((folder) => {		
-			var code = `describe('${folder.name}', () => {`;
-			var test;
-			var specs = folder.tests;
-			for (test of specs)
-			{
-				let testCode = test.code;
+        folders.forEach((folder) => {		
+            var code = `describe('${folder.name}', () => {`;
+            var test;
+            var specs = folder.tests;
+            for (test of specs)
+            {
+                let testCode = test.code;
                 const title = test.title.replace(/[^\w .()-]/g, '');
                 if(this.type === 'e2e') {
                     if(testCode === '') {
@@ -108,18 +108,18 @@ let CypressRunner = class {
                     }
                 }
                 code = code + "\n});";
-			};
+            };
 
-			code = code + "});";
+            code = code + "});";
 
-			fs.mkdirSync(specDir, { recursive: true });
-			fs.writeFileSync(`${specDir}/${folder.name}_specs.cy.js`, code, { flag: 'w+' });
+            fs.mkdirSync(specDir, { recursive: true });
+            fs.writeFileSync(`${specDir}/${folder.name}_specs.cy.js`, code, { flag: 'w+' });
 
-			console.log(`Generated spec file: ${folder.name}`);
-		});
+            console.log(`Generated spec file: ${folder.name}`);
+        });
 
         this.runConfig.spec = path.resolve(specDir, "*.cy.js");
-	}
+    }
 
     async runCypress() {
         this.runConfig.reporterOptions.reportDir = cypressFolderStructure(this.projectFolder).reportDir;

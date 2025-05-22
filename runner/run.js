@@ -61,32 +61,46 @@ const runCypress = async (params) => {
                 let newFormattedResults = [];
                 for (const result of formattedResults) {
                     visualRunner.imageTitles = result.title;
+                    visualRunner.markupTitles = result.title;
                     visualRunner.copyCurrent(
                         `${cypressRunner.projectFolder}/cypress/screenshots/${result.screenshot}`,
                         `${cypressRunner.projectFolder}/cypress/reports/markup.json`
                     );
-                    const baseImage = await visualRunner.checkBase(result.screenshot);
-
-                    if (!baseImage) {
-                        result.visualTest = visualRunner.formatResults("Base image not found, setting new base image", 0);
-                        newFormattedResults.push(result);
-                        continue;
-                    }
 
                     if (run.comparison_types.includes("pixel")) {
-                        const numDiffPixels = visualRunner.comparePixels();
-                        result.visualTest = visualRunner.formatResults("Base image found, comparing images", numDiffPixels); 
+                        const baseImage = await visualRunner.checkBase(result.screenshot);
+                        if (!baseImage) {
+                            result.pixelTest = visualRunner.formatResults("Base image not found, setting new base image", 0);
+                        } else {
+                            const numDiffPixels = visualRunner.comparePixels();
+                            result.pixelTest = visualRunner.formatResults("Base image found, comparing images", numDiffPixels);
+                        } 
                     }
 
                     if (run.comparison_types.includes("markup")) {
-                        console.log("Markup comparison not implemented yet");
+                        const baseMarkup = await visualRunner.checkBaseMarkup();
+                        if(!baseMarkup) {
+                            result.markupTest = {msg: "Base markup not found, setting new base markup"};
+                        } else {
+                            result.markupTest = visualRunner.compareMarkup();
+                        }
+                    }
+
+                    if (run.comparison_types.includes("ai")) {
+                        const baseImage = await visualRunner.checkBase(result.screenshot);
+                        if (!baseImage) {
+                            result.aiTest = visualRunner.formatResults("Base image not found, setting new base image", 0);
+                        } else {
+                            const aiResponse = await visualRunner.compareAI();
+                            result.aiTest = visualRunner.formatResults(aiResponse);
+                        } 
                     }
                     
                     newFormattedResults.push(result);
                 }
                 formattedResults = newFormattedResults;
             }
-            console.log("Formatted results", formattedResults);
+            console.log("Formatted results", JSON.stringify(formattedResults, null, 2));
             // await sqs.sendMessage(config.sqsQueueUrls.oryx, {
             //     use: "cypress",
             //     run: {
@@ -97,7 +111,7 @@ const runCypress = async (params) => {
             //     }
             // });
 
-            // cypressRunner.deleteRunFolder();
+            cypressRunner.deleteRunFolders();
             
         }
     }
