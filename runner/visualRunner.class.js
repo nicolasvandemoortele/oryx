@@ -51,30 +51,32 @@ let VisualRunner = class {
 
     async checkBase(image) {
         const baseImage = await checkFileExists(`${this.project}/${this.base}`);
+        
         if (baseImage) {
             if(!fs.existsSync(this.project)) fs.mkdirSync(this.project);
             await downloadFile(this.baseS3Path, this.basePath);
 
             return true;
-        } else {
-            copyFile(image, this.baseS3Path);
-
-            return false;
         }
+
+        copyFile(image, this.baseS3Path);
+
+        return false;      
     }
 
     async checkBaseMarkup(markup) {
         const baseMarkup = await checkFileExists(`${this.project}/${this.baseMarkup}`);
+
         if (baseMarkup) {
             if(!fs.existsSync(this.project)) fs.mkdirSync(this.project);
             await downloadFile(this.baseMarkupS3Path, this.baseMarkupPath);
 
             return true;
-        } else {
-            uploadFile(markup, this.baseMarkupS3Path);
-
-            return false;
         }
+
+        uploadFile(markup, this.baseMarkupS3Path);
+
+        return false;
     }
 
     comparePixels() {
@@ -146,7 +148,7 @@ let VisualRunner = class {
             base: this.baseS3Path,
             current: this.currentS3Path,
             diff: this.diffS3Path,
-            pixel: pixel,
+            pixel_diff: pixel,
         }
     }
 };

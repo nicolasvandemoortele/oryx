@@ -68,13 +68,22 @@ const runCypress = async (params) => {
                     );
 
                     if (run.comparison_types.includes("pixel")) {
+                        let numDiffPixels = 0;
+                        let resultMessage = "";
                         const baseImage = await visualRunner.checkBase(result.screenshot);
                         if (!baseImage) {
-                            result.pixelTest = visualRunner.formatResults("Base image not found, setting new base image", 0);
+                            resultMessage = "Base image not found, setting new base image";
                         } else {
-                            const numDiffPixels = visualRunner.comparePixels();
-                            result.pixelTest = visualRunner.formatResults("Base image found, comparing images", numDiffPixels);
-                        } 
+                            numDiffPixels = visualRunner.comparePixels();
+                            resultMessage = "Base image found, comparing images";
+
+                            if ((numDiffPixels) && (run.comparison_types.includes("ai"))) {
+                                const aiResponse = await visualRunner.compareAI();
+                                resultMessage = aiResponse;
+                            }
+                        }
+                        
+                        result.pixelTest = visualRunner.formatResults(resultMessage, numDiffPixels);
                     }
 
                     if (run.comparison_types.includes("markup")) {
@@ -84,16 +93,6 @@ const runCypress = async (params) => {
                         } else {
                             result.markupTest = visualRunner.compareMarkup();
                         }
-                    }
-
-                    if (run.comparison_types.includes("ai")) {
-                        const baseImage = await visualRunner.checkBase(result.screenshot);
-                        if (!baseImage) {
-                            result.aiTest = visualRunner.formatResults("Base image not found, setting new base image", 0);
-                        } else {
-                            const aiResponse = await visualRunner.compareAI();
-                            result.aiTest = visualRunner.formatResults(aiResponse);
-                        } 
                     }
                     
                     newFormattedResults.push(result);
