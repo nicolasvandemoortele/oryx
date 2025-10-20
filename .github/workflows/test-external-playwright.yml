@@ -34,6 +34,10 @@ jobs:
         working-directory: tests
         run: npm install
 
+      - name: Setup Playwright
+        working-directory: tests
+        run: npx playwright install
+
       # 7. Run Playwright tests
       - name: Run Playwright tests
         working-directory: tests
