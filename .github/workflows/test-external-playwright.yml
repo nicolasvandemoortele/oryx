@@ -9,6 +9,7 @@ on:
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
+    environment: qa
 
     steps:
       # 1. Checkout the main project (Repo A)
