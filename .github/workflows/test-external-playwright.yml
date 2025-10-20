@@ -47,7 +47,6 @@ jobs:
           echo "BASE_URL=${{ vars.BASE_URL }}" >> .env
           echo "USERNAME=${{ vars.USERNAME }}" >> .env
           echo "PASSWORD=${{ vars.PASSWORD }}" >> .env
-          ls -la
 
       # 7. Run Playwright tests
       - name: Run Playwright tests
@@ -56,6 +55,7 @@ jobs:
 
       # 8. Upload Playwright report
       - uses: actions/upload-artifact@v4
+        working-directory: tests
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
