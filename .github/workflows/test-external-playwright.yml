@@ -29,16 +29,17 @@ jobs:
         with:
           node-version: 20
 
-      # 6. Install dependencies for the test repo
+      # 4. Install dependencies for the test repo
       - name: Install test dependencies
         working-directory: tests
         run: npm install
 
+      #5. Setup Playwright
       - name: Setup Playwright
         working-directory: tests
         run: npx playwright install
 
-      # 7. Run Playwright tests
+      # 6. Run Playwright tests
       - name: Run Playwright tests
         working-directory: tests
         run: npx playwright test --config=playwright.config.ts --grep @Test-1
