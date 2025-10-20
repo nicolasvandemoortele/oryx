@@ -39,7 +39,14 @@ jobs:
         working-directory: tests
         run: npx playwright install
 
-      # 6. Run Playwright tests
+      #6. Create .env file
+      - name: Create .env file
+        run: |
+          echo "BASE_URL=${{ vars.BASE_URL }}" >> .env
+          echo "USERNAME=${{ vars.USERNAME }}" >> .env
+          echo "PASSWORD=${{ vars.PASSWORD }}" >> .env
+
+      # 7. Run Playwright tests
       - name: Run Playwright tests
         working-directory: tests
         run: npx playwright test --config=playwright.config.ts --grep @Test-1
