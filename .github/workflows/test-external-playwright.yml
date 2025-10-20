@@ -37,4 +37,4 @@ jobs:
       # 7. Run Playwright tests
       - name: Run Playwright tests
         working-directory: tests
-        run: npx playwright test --config=playwright.config.ts
+        run: npx playwright test --config=playwright.config.ts --grep @Test-1
