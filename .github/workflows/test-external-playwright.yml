@@ -1,0 +1,40 @@
+name: Run Playwright Tests from External Repo
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the main project (Repo A)
+      - name: Checkout app repo
+        uses: actions/checkout@v4
+
+      # 2. Checkout the Playwright tests repo (Repo B)
+      - name: Checkout tests repo
+        uses: actions/checkout@v4
+        with:
+          repository: nicolasvandemoortele/PlaywrightBUS
+          path: tests
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }} # must have repo read access
+
+      # 3. Set up Node
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 6. Install dependencies for the test repo
+      - name: Install test dependencies
+        working-directory: tests
+        run: npm install
+
+      # 7. Run Playwright tests
+      - name: Run Playwright tests
+        working-directory: tests
+        run: npx playwright test --config=playwright.config.ts
