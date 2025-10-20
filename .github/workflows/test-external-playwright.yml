@@ -42,6 +42,7 @@ jobs:
 
       #6. Create .env file
       - name: Create .env file
+        working-directory: tests
         run: |
           echo "BASE_URL=${{ vars.BASE_URL }}" >> .env
           echo "USERNAME=${{ vars.USERNAME }}" >> .env
